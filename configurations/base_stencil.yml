@@ -1,0 +1,19 @@
+secrets:
+  secretKey: # django secret key
+services:
+  database:
+    host: # database host
+    user: # database user
+    password: # database password
+    name: # database name
+    port: # database port, default: 5432
+emails:
+  emailBackend: # The backend used for sending emails
+  emailHost: # The email service provider used
+  emailUseTls: # Whether an email should be encrypted via TLS or not
+  emailPort: # The port used by SMTP server
+  emailHostUser: # The email address from which all emails will be sent
+  emailHostPassword: # The password of the host's email account
+environment:
+  production: # Whether the backend is run for development of production environment (boolean field)
+  hostURL: # URL on which the portal is served e.g. 127.0.0.1

@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+#swap files
+*.swo
+*.swp
+
+# pyenv
+.python-version
+
+# Migrations
+**/migrations/*
+!**/migrations/__init__.py
+
+# Configuration file
+base.yml
+
+# Media files
+media/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Static files
+static/
+
+# VS Code
+.vscode
+
+# IntelliJ configuration
+.idea/
+
