@@ -1,5 +1,9 @@
 secrets:
   secretKey: # django secret key
+  oAuth:
+    clientId: # channel-i oAuth client id
+    clientSecret: # channel-i oAuth client secret
+    redirectURI: # channel-i oAuth redirect uri
 services:
   database:
     host: # database host
