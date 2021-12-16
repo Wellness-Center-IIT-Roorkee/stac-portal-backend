@@ -37,6 +37,10 @@ class User(AbstractUser):
     )
 
     def get_role(self):
+        """
+        Model method to determine the user roles
+        :return: role of the user
+        """
         if hasattr(self, STUDENT):
             return STUDENT
         if hasattr(self, FACULTY):
