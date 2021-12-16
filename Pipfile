@@ -11,6 +11,8 @@ psycopg2-binary = "*"
 requests = "*"
 
 [dev-packages]
+ipdb = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.10"
