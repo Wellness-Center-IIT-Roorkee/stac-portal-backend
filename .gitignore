@@ -19,6 +19,7 @@ base.yml
 
 # Media files
 media/
+media_files/
 
 # Environments
 .env
@@ -31,6 +32,7 @@ venv.bak/
 
 # Static files
 static/
+static_files/
 
 # VS Code
 .vscode

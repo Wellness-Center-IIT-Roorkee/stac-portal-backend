@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'base_auth.apps.BaseAuthConfig',
+    'stac_application.apps.StacApplicationConfig',
 ]
 
 MIDDLEWARE = [
@@ -151,7 +152,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static_files/'
+STATIC_ROOT = PARENT_DIR/'static_files'
+
+# Media files
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = PARENT_DIR/'media_files'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
