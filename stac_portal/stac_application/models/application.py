@@ -32,7 +32,7 @@ class Application(models.Model):
         choices=SEMESTERS,
     )
 
-    supervisor_email = models.EmailField(_('supervisor email'),)
+    supervisor_email = models.EmailField(_('supervisor email'), )
 
     hod_email = models.EmailField(_('HOD email'), )
 
@@ -40,39 +40,45 @@ class Application(models.Model):
         _('supervisor approval status'),
         max_length=7,
         choices=APPROVAL_STATUS,
-        default=PENDING
+        default=PENDING,
+        blank=True,
     )
 
     hod_approval_status = models.CharField(
         _('HOD approval status'),
         max_length=3,
         choices=APPROVAL_STATUS,
-        default=PENDING
+        default=PENDING,
+        blank=True,
     )
 
     admin_approval_status = models.CharField(
         _('admin approval status'),
         max_length=3,
         choices=APPROVAL_STATUS,
-        default=PENDING
+        default=PENDING,
+        blank=True,
     )
 
     application_form = models.FileField(
         _('application form'),
-        upload_to=UploadTo('application-forms/%Y')
+        upload_to=UploadTo('application-forms/%Y'),
     )
 
     extension_letter = models.FileField(
         _('extension letter'),
-        upload_to=UploadTo('extension-letters/%Y')
+        upload_to=UploadTo('extension-letters/%Y'),
     )
 
     academic_summary = models.FileField(
         _('academic summary'),
-        upload_to=UploadTo('academic-summaries/%Y')
+        upload_to=UploadTo('academic-summaries/%Y'),
     )
 
-    submission_time = models.DateTimeField(auto_now_add=True)
+    submission_time = models.DateTimeField(
+        _('submission time'),
+        auto_now_add=True,
+    )
 
     def __str__(self):
         student = self.student
