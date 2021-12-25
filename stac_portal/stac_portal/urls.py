@@ -21,6 +21,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('base_auth.urls')),
+    path('api/stac/', include('stac_application.urls')),
 ]
 
 if not settings.IS_PRODUCTION_ENV:
