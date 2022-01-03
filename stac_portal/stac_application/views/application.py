@@ -68,14 +68,11 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = StudentApplicationDetailSerializer(data=request.data)
 
-        try:
-            serializer.is_valid(raise_exception=True)
-            user = request.user
-            student = user.student
-            serializer.save(student=student)
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return response.Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        student = user.student
+        serializer.save(student=student)
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['post'], permission_classes=[IsAdminOrIsFaculty])
     def change_status(self, request, pk=None):
