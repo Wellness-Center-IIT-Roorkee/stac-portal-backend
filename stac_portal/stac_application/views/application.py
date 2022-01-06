@@ -74,6 +74,14 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         serializer.save(student=student)
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.supervisor_approval_status = PENDING
+        instance.hod_approval_status = PENDING
+        instance.admin_approval_status = PENDING
+        instance.save()
+        return super().update(request, *args, **kwargs)
+
     @action(detail=True, methods=['post'], permission_classes=[IsAdminOrIsFaculty])
     def change_status(self, request, pk=None):
         user = request.user
