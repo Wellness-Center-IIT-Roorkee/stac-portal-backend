@@ -80,6 +80,16 @@ class Application(models.Model):
         auto_now_add=True,
     )
 
+    remarks = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        default=None,
+    )
+
+    class Meta:
+        ordering = ['-submission_time']
+
     def __str__(self):
         student = self.student
         submission_time = self.submission_time

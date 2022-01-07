@@ -3,7 +3,7 @@ from rest_framework import permissions, viewsets, status, response
 from rest_framework.decorators import action
 
 from base_auth.constants import ADMIN, FACULTY, STUDENT
-from stac_application.constants import APPROVED, PENDING, REJECTED
+from stac_application.constants import APPROVED, PENDING, REJECTED, INCOMPLETE
 from stac_application.models import Application
 from stac_application.permissions import StacPermission, IsAdminOrIsFaculty
 from stac_application.serializers import (
@@ -87,7 +87,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         user = request.user
         application_instance = self.get_object()
         application_status = request.data.get('status')
-        allowed_status = [APPROVED, PENDING, REJECTED]
+        allowed_status = [APPROVED, PENDING, REJECTED, INCOMPLETE]
 
         if not status:
             return response.Response(
@@ -109,6 +109,8 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 application_instance.supervisor_approval_status = application_status
         elif role == ADMIN:
             application_instance.admin_approval_status = application_status
+            remarks = request.data.get('remarks')
+            application_instance.remarks = remarks
 
         application_instance.save()
         return response.Response(
