@@ -101,7 +101,7 @@ class LoginView(APIView):
                             )
 
                     elif 'FacultyMember' in person_roles:
-                        Faculty.objects.create(user=request_user)
+                        Faculty.objects.get_or_create(user=request_user)
 
                     login(request, request_user)
                     user_serializer = UserSerializer(request_user)
