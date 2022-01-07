@@ -76,7 +76,7 @@ class FacultyApplicationDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Application
-        exclude = ['hod_approval_status', 'admin_approval_status', 'supervisor_approval_status']
+        exclude = ['hod_approval_status', 'admin_approval_status', 'supervisor_approval_status', 'remarks']
 
     def get_student(self, instance):
         student_serializer = StudentDetailSerializer(instance=instance.student)
@@ -98,6 +98,7 @@ class FacultyApplicationDetailSerializer(serializers.ModelSerializer):
 class StudentApplicationDetailSerializer(serializers.ModelSerializer):
     student = serializers.SerializerMethodField(read_only=True)
     status = serializers.CharField(source='admin_approval_status', read_only=True)
+    remarks = serializers.CharField(read_only=True)
 
     class Meta:
         model = Application
