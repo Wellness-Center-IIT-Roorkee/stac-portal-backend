@@ -21,3 +21,5 @@ emails:
 environment:
   production: # Whether the backend is run for development of production environment (boolean field)
   hostURL: # URL on which the portal is served e.g. 127.0.0.1
+  trustedOrigins:
+    - # Add trusted CSRF Origins eg. http://localhost:8000/
