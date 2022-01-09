@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 PARENT_DIR = BASE_DIR.parent
 
 # configuration file contains configurations for the app
-CONFIGURATION_FILE = open(PARENT_DIR/'configurations/base.yml')
+CONFIGURATION_FILE = open(PARENT_DIR / 'configurations/base.yml')
 
 CONFIGURATION = yaml.safe_load(CONFIGURATION_FILE)
 
@@ -31,13 +31,14 @@ OAUTH_REDIRECT_URI = OAUTH_CONFIGURATION['redirectURI']
 
 IS_PRODUCTION_ENV = not ENVIRONMENT['debug']
 HOST_URL = ENVIRONMENT['hostURL']
-
+TRUSTED_ORIGINS = ENVIRONMENT['trustedOrigins']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not IS_PRODUCTION_ENV
 
 ALLOWED_HOSTS = [HOST_URL, ]
 
+CSRF_TRUSTED_ORIGINS = [*TRUSTED_ORIGINS, ]
 
 # Application definition
 
@@ -83,7 +84,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'stac_portal.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -107,14 +107,12 @@ SESSION_COOKIE_NAME = 'stac_session'
 
 CSRF_COOKIE_NAME = 'stac_csrftoken'
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -134,7 +132,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -148,17 +145,25 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Emails
+
+EMAIL_BACKEND = EMAIL['emailBackend']
+EMAIL_HOST = EMAIL['emailHost']
+EMAIL_USE_TLS = EMAIL['emailUseTls']
+EMAIL_PORT = EMAIL['emailPort']
+EMAIL_HOST_USER = EMAIL['emailHostUser']
+EMAIL_HOST_PASSWORD = EMAIL['emailHostPassword']
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static_files/'
-STATIC_ROOT = PARENT_DIR/'static_files'
+STATIC_ROOT = PARENT_DIR / 'static_files'
 
 # Media files
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = PARENT_DIR/'media_files'
+MEDIA_ROOT = PARENT_DIR / 'media_files'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
