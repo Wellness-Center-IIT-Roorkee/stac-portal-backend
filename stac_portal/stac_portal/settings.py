@@ -40,6 +40,11 @@ ALLOWED_HOSTS = [HOST_URL, ]
 
 CSRF_TRUSTED_ORIGINS = [*TRUSTED_ORIGINS, ]
 
+# Security options for the stac portal
+if IS_PRODUCTION_ENV:
+    USE_X_FORWARDED_HOST = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 
 INSTALLED_APPS = [
