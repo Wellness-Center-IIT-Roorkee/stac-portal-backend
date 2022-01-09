@@ -20,7 +20,6 @@ class Application(models.Model):
     phone_number = models.CharField(
         _('phone number'),
         max_length=15,
-        unique=True,
         blank=True,
         null=True,
         default=None,
