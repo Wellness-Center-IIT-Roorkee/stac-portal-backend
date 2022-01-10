@@ -14,6 +14,8 @@ from stac_application.serializers import (
     FacultyApplicationDetailSerializer,
     StudentApplicationDetailSerializer,
 )
+from stac_application.utils.send_email import send_email_async
+from stac_application.utils.email_templates import get_new_application_mail, get_update_application_mail
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -72,6 +74,13 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         user = request.user
         student = user.student
         serializer.save(student=student)
+
+        application = Application.objects.get(id=serializer.data['id'])
+        email_body = get_new_application_mail(application)
+        email_subject = 'Application received through StAC portal'
+        send_email_async(subject=email_subject, body=email_body, to=[application.hod_email, ])
+        send_email_async(subject=email_subject, body=email_body, to=[application.supervisor_email, ])
+
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
@@ -80,6 +89,12 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         instance.hod_approval_status = PENDING
         instance.admin_approval_status = PENDING
         instance.save()
+
+        email_body = get_update_application_mail(instance)
+        email_subject = 'Application updated through StAC portal'
+        send_email_async(subject=email_subject, body=email_body, to=[instance.hod_email, ])
+        send_email_async(subject=email_subject, body=email_body, to=[instance.supervisor_email, ])
+
         return super().update(request, *args, **kwargs)
 
     @action(detail=True, methods=['post'], permission_classes=[IsAdminOrIsFaculty])
