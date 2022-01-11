@@ -6,9 +6,10 @@ from rest_framework.views import APIView
 from stac_portal.settings import OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REDIRECT_URI
 from base_auth.constants.oauth_urls import GET_ACCESS_TOKEN_URL, \
     GET_USER_DATA_URL
-from base_auth.models import User, Student, Faculty
+from base_auth.models import User, Student, Faculty, Admin
 from base_auth.serializers.user import UserSerializer
 from base_auth.utils import update_or_create_student
+
 
 # TODO: Log all the errors encountered
 
@@ -57,16 +58,6 @@ class LoginView(APIView):
                     roles = person.get('roles')
                     person_roles = [role['role'] for role in roles if role['activeStatus'] == 'ActiveStatus.IS_ACTIVE']
 
-                    # Only users with student or faculty role can login using channel i
-                    if 'Student' not in person_roles and 'FacultyMember' not in person_roles:
-                        response_data = {
-                            'error': 'Invalid role',
-                        }
-                        return response.Response(
-                            data=response_data,
-                            status=status.HTTP_403_FORBIDDEN
-                        )
-
                     institute_email = contact_information.get(
                         'instituteWebmailAddress'
                     )
@@ -82,6 +73,20 @@ class LoginView(APIView):
                         'display_picture': display_picture,
                         'username': institute_email,
                     }
+
+                    # Only users with student or faculty role can login using channel i
+                    if 'Student' not in person_roles and 'FacultyMember' not in person_roles:
+                        # Check if user has admin role
+                        try:
+                            Admin.objects.get(user__email=institute_email)
+                        except Admin.DoesNotExist:
+                            response_data = {
+                                'error': 'Invalid role',
+                            }
+                            return response.Response(
+                                data=response_data,
+                                status=status.HTTP_403_FORBIDDEN
+                            )
 
                     request_user, created = User.objects.get_or_create(
                         email=institute_email,
