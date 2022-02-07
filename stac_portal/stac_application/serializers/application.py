@@ -1,9 +1,16 @@
 from rest_framework import serializers
 
-from base_auth.constants import FACULTY
+from base_auth.constants import FACULTY, STUDENT
 from stac_application.constants import NOT_AVAILABLE
-from stac_application.models import Application
-from stac_application.serializers.student import StudentShortSerializer, StudentDetailSerializer
+from stac_application.models import Application, MiscellaneousDocument
+from stac_application.serializers.student import StudentShortSerializer, \
+    StudentDetailSerializer
+
+
+class MiscellaneousDocumentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MiscellaneousDocument
+        fields = ['id', 'document', ]
 
 
 class AdminApplicationShortSerializer(serializers.ModelSerializer):
@@ -51,7 +58,8 @@ class FacultyApplicationShortSerializer(serializers.ModelSerializer):
 
 
 class StudentApplicationShortSerializer(serializers.ModelSerializer):
-    status = serializers.CharField(source='admin_approval_status', read_only=True)
+    status = serializers.CharField(source='admin_approval_status',
+                                   read_only=True)
 
     class Meta:
         model = Application
@@ -60,6 +68,8 @@ class StudentApplicationShortSerializer(serializers.ModelSerializer):
 
 class AdminApplicationDetailSerializer(serializers.ModelSerializer):
     student = serializers.SerializerMethodField()
+    miscellaneous_documents = MiscellaneousDocumentsSerializer(read_only=True,
+                                                               many=True)
 
     class Meta:
         model = Application
@@ -73,10 +83,13 @@ class AdminApplicationDetailSerializer(serializers.ModelSerializer):
 class FacultyApplicationDetailSerializer(serializers.ModelSerializer):
     student = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    miscellaneous_documents = MiscellaneousDocumentsSerializer(read_only=True,
+                                                               many=True)
 
     class Meta:
         model = Application
-        exclude = ['hod_approval_status', 'admin_approval_status', 'supervisor_approval_status', 'remarks']
+        exclude = ['hod_approval_status', 'admin_approval_status',
+                   'supervisor_approval_status', 'remarks']
 
     def get_student(self, instance):
         student_serializer = StudentDetailSerializer(instance=instance.student)
@@ -97,13 +110,37 @@ class FacultyApplicationDetailSerializer(serializers.ModelSerializer):
 
 class StudentApplicationDetailSerializer(serializers.ModelSerializer):
     student = serializers.SerializerMethodField(read_only=True)
-    status = serializers.CharField(source='admin_approval_status', read_only=True)
+    status = serializers.CharField(source='admin_approval_status',
+                                   read_only=True)
     remarks = serializers.CharField(read_only=True)
+    miscellaneous_documents = MiscellaneousDocumentsSerializer(read_only=True,
+                                                               many=True)
 
     class Meta:
         model = Application
-        exclude = ['hod_approval_status', 'admin_approval_status', 'supervisor_approval_status']
+        exclude = ['hod_approval_status', 'admin_approval_status',
+                   'supervisor_approval_status']
 
     def get_student(self, instance):
         student_serializer = StudentDetailSerializer(instance=instance.student)
         return student_serializer.data
+
+    def validate(self, data):
+        """
+        Validate that hod_email and supervisor_email field is not blank for
+        PH.D. students
+        """
+        hod_email = data['hod_email']
+        supervisor_email = data['supervisor_email']
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            user = request.user
+            print(user)
+            if hasattr(user, 'get_role') and user.get_role() == STUDENT:
+                student = user.student
+                if 'ph.d.' in student.branch.lower():
+                    if not hod_email or not supervisor_email:
+                        raise serializers.ValidationError(
+                            'Supervisor email and HOD email are compulsory fields')
+                    return data
+        return data
