@@ -11,6 +11,7 @@ class StudentShortSerializer(serializers.BaseSerializer):
             'name': instance.user.name,
             'email': instance.user.email,
             'enrollment_number': instance.enrollment_number,
+            'branch': instance.branch,
         }
 
 

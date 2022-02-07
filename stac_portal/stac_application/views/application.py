@@ -15,7 +15,8 @@ from stac_application.serializers import (
     StudentApplicationDetailSerializer,
 )
 from stac_application.utils.send_email import send_email_async
-from stac_application.utils.email_templates import get_new_application_mail, get_update_application_mail
+from stac_application.utils.email_templates import get_new_application_mail, \
+    get_update_application_mail
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -67,21 +68,39 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         except KeyError:
             return StudentApplicationShortSerializer
 
-    def create(self, request, *args, **kwargs):
-        serializer = StudentApplicationDetailSerializer(data=request.data)
+    def get_serializer_context(self):
+        context = super(ApplicationViewSet, self).get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
+    def create(self, request, *args, **kwargs):
+        request.data._mutable = True
+        data = request.data
+        miscellaneous_documents = data.pop('miscellaneous_documents')
+        request.data._mutable = False
+
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         user = request.user
         student = user.student
         serializer.save(student=student)
 
         application = Application.objects.get(id=serializer.data['id'])
+        if miscellaneous_documents:
+            for document in miscellaneous_documents:
+                application.miscellaneous_documents.create(document=document)
+
         email_body = get_new_application_mail(application)
         email_subject = 'Application received through StAC portal'
-        send_email_async(subject=email_subject, body=email_body, to=[application.hod_email, ])
-        send_email_async(subject=email_subject, body=email_body, to=[application.supervisor_email, ])
+        if application.hod_email:
+            send_email_async(subject=email_subject, body=email_body,
+                             to=[application.hod_email, ])
+        if application.supervisor_email:
+            send_email_async(subject=email_subject, body=email_body,
+                             to=[application.supervisor_email, ])
 
-        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.data,
+                                 status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -90,14 +109,28 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         instance.admin_approval_status = PENDING
         instance.save()
 
+        request.data._mutable = True
+        data = request.data
+        miscellaneous_documents = data.pop('miscellaneous_documents')
+        request.data._mutable = False
+
+        if miscellaneous_documents:
+            for document in miscellaneous_documents:
+                instance.miscellaneous_documents.create(document=document)
+
         email_body = get_update_application_mail(instance)
         email_subject = 'Application updated through StAC portal'
-        send_email_async(subject=email_subject, body=email_body, to=[instance.hod_email, ])
-        send_email_async(subject=email_subject, body=email_body, to=[instance.supervisor_email, ])
+        if instance.hod_email:
+            send_email_async(subject=email_subject, body=email_body,
+                             to=[instance.hod_email, ])
+        if instance.supervisor_email:
+            send_email_async(subject=email_subject, body=email_body,
+                             to=[instance.supervisor_email, ])
 
         return super().update(request, *args, **kwargs)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAdminOrIsFaculty])
+    @action(detail=True, methods=['post'],
+            permission_classes=[IsAdminOrIsFaculty])
     def change_status(self, request, pk=None):
         user = request.user
         application_instance = self.get_object()
