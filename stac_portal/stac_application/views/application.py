@@ -76,7 +76,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         request.data._mutable = True
         data = request.data
-        miscellaneous_documents = data.pop('miscellaneous_documents')
+        miscellaneous_documents = data.pop('miscellaneous_documents', None)
         request.data._mutable = False
 
         serializer = self.get_serializer(data=data)
@@ -111,7 +111,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
         request.data._mutable = True
         data = request.data
-        miscellaneous_documents = data.pop('miscellaneous_documents')
+        miscellaneous_documents = data.pop('miscellaneous_documents', None)
         request.data._mutable = False
 
         if miscellaneous_documents:

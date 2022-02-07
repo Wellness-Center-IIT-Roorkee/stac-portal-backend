@@ -130,8 +130,8 @@ class StudentApplicationDetailSerializer(serializers.ModelSerializer):
         Validate that hod_email and supervisor_email field is not blank for
         PH.D. students
         """
-        hod_email = data['hod_email']
-        supervisor_email = data['supervisor_email']
+        hod_email = data.get('hod_email')
+        supervisor_email = data.get('supervisor_email')
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             user = request.user
